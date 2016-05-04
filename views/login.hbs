@@ -1,0 +1,21 @@
+<h1>TRIPHUB</h1>
+
+{{#if error}}
+<p> No username/password combination found</p>
+{{/if}}
+
+<form action="/login" method="post">
+  Email:  <input type="text" name="email"><br>
+  Password:  <input type="password" name="password"><br>
+  <button type="submit">Login!</button>
+</form>
+<br>
+<br>
+<br>
+
+
+<p> Not a member yet?</p>
+<form action="/register" method="get">
+	<button type="submit">Register</button>
+</form>
+

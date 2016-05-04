@@ -1,0 +1,51 @@
+
+<form action="/deleteTrip/{{slug}}" method="post">
+  <button name='{{tripName}}' type="submit">Delete Trip</button>
+</form>
+
+<form action="/update/{{slug}}" method="post">
+  <button type="submit">Home</button>
+
+
+
+<h2>TRIPHUB</h2> <h1>{{tripName}}</h1>
+<br>
+
+<h3> Departing Flight </h3>
+<h4> {{depFlightNum}} </h4>
+<h4> {{dDate}}</h4>
+<h4> Terminal {{dTerm}} </h4>
+<h3> Hotel Info </h3>
+<h4> {{hName}} </h4>
+<h4> {{hAddress}} </h4>
+<h4> Check In: {{checkIn}} </h4>
+<h4> Check Out: {{checkOut}} </h4>
+<h3> Return Flight </h3>
+<h4> {{retFlightNum}}</h4>
+<h4> {{rDate}}</h4>
+<h4> Terminal {{rTerm}}</h4>
+
+<h3> TO DO LIST </h3>
+
+{{#each item}}
+
+<input type='checkbox' name='{{{this.itemName}}}' value='{{{this.itemCompleted}}}'>{{{this.itemName}}}<br>
+
+{{/each}}
+
+</form>
+
+<form action="/add/{{slug}}" method="post">
+	To do: <input type="text" name="toDo"> <button type="submit">Submit</button>
+</form>
+
+<div id="slideshow">
+   <div>
+     <img src="//farm6.static.flickr.com/5224/5658667829_2bb7d42a9c_m.jpg">
+   </div>
+   <div>
+     <img src="//farm6.static.flickr.com/5230/5638093881_a791e4f819_m.jpg">
+   </div>
+</div>
+
+

@@ -1,0 +1,17 @@
+<form action="/logout" method="get">
+  <button type="submit">Logout</button>
+</form>
+
+<h1>TRIPHUB</h1>
+
+<h2> Your Trips </h2>
+
+{{#each trip}}
+	<h3 style='color:pink'><a href="/myTrips/{{slug}}">{{tripName}}</a></h3>
+{{/each}}
+
+<br>
+<br>
+<form action="/addTrip" method="get">
+	<button type="submit"> Add a Trip! </button>
+</form>
