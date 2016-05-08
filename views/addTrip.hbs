@@ -1,32 +1,54 @@
-<div class='row'>
-<div class='col-md-3'></div>
-<div class='col-md-6'>
-  <form action="/home" method="get">
-  	<button id="topButton" type="submit">Cancel</button>
-  </form> 
 
-  <h1 id='titleMain'>TRIPHUB</h1>
-  <br>
-  <h3>{{error}}</h3>
-  <br>
-  <form action="/addTrip" method="post">
-    Trip Name: <input type="text" name="name"><br>
-    Trip Destination: <input type="text" name="dest"><br>
-    Departure Date: <input type="text" name="ddate"><br>
-    Outbound Flight Number: <input type="text" name="flightOutNum"><br>
-    Airline : <input type="text" name="airOut"><br>
-    Terminal: <input type="text" name="termOut"><br>
-    Return Date: <input type="text" name="rdate"><br>
-    Return Flight Number: <input type="text" name="flightInNum"><br>
-    Airline: <input type="text" name="airIn"><br>
-    Terminal: <input type="text" name="termIn"><br> 
-    Hotel Name: <input type="text" name="hName"><br>
-    Hotel Address: <input type="text" name="hAddress"><br>
-    Check-in Date: <input type="text" name="hChIn"><br>
-    Check-out Date: <input type="text" name="hChOut"><br> 
-    <button type="submit">Submit</button>
-  </form>
-</div>
-<div class='col-md-3'></div>
 
+<body>
+<img src="https://media.giphy.com/media/EElpW3QTZE7Mk/giphy.gif" id="bg" alt="">
+<div id="wrapper">
+  <div id="header">
+    <form action="/home" method="get">
+      <button id='navigationButton'style="float: right; width: 130px; margin-right: 55px; margin-top:15px" type="submit">Cancel</button>
+      <br>
+    </form> 
+  </div>
+  <div id="content">
+    <div class="row">
+        
+      <div class='col-md-3'></div>
+
+      <div class='col-md-6' style=' background-color: rgba(255,255,255,0.9)'>
+
+        <h1 id='title'>TRIPHUB</h1>
+        <br>
+        <h3>{{error}}</h3>
+        <br>
+        <form action="/addTrip" method="post">
+          <h6 style="display: inline"> Trip Name: </h6><input type="text" name="name"><br>
+          <h6 style="display: inline"> Trip Destination: </h6><input type="text" name="dest"><br>
+          <h6 style="display: inline"> Departure Date: </h6><input type="text" name="ddate"><br>
+          <h6 style="display: inline"> Outbound Flight Number: </h6><input type="text" name="flightOutNum"><br>
+          <h6 style="display: inline"> Airline : </h6><input type="text" name="airOut"><br>
+          <h6 style="display: inline"> Terminal: </h6><input type="text" name="termOut"><br>
+          <h6 style="display: inline"> Return Date: </h6> <input type="text" name="rdate"><br>
+          <h6 style="display: inline"> Return Flight Number: </h6><input type="text" name="flightInNum"><br>
+          <h6 style="display: inline"> Airline: </h6><input type="text" name="airIn"><br>
+          <h6 style="display: inline"> Terminal: </h6><input type="text" name="termIn"><br> 
+          <h6 style="display: inline"> Hotel Name: </h6> <input type="text" name="hName"><br>
+          <h6 style="display: inline"> Hotel Address: </h6><input type="text" name="hAddress"><br>
+          <h6 style="display: inline"> Check-in Date: </h6> <input type="text" name="hChIn"><br>
+          <h6 style="display: inline"> Check-out Date: </h6><input type="text" name="hChOut"><br> 
+          <button id = 'pinkButton' type="submit">Submit</button>
+        </form>
+        <br>
+      </div>
+
+      <div class='col-md-3'></div>
+    </div>
+  </div>
+  <div id='footer'>
+   <br>
+      <p>Made by: <a href="http://www.nathanielpisierra.com">
+    Nathaniel PiSierra</a>.</p>
+  </div>
 </div>
+
+</body>
+

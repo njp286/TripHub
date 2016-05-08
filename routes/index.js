@@ -3,7 +3,7 @@ var session = require('express-session')
 var router = express.Router();
 var authy = require('authy')('41f3fe0a27e1c9cba05c30933811a2b8', 'http://sandbox-api.authy.com');
 //var authy = require('authy')('YiHSBD4U3V6IThs3KiFRKKZwltpw36KY');
-
+var Flickr = require('node-flickr');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
 var Trip = mongoose.model('Trip');
@@ -20,6 +20,9 @@ var firstName;
 var lastName;
 var email;
 var password;
+
+var keys = {"api_key": "7a55b9d8e3e3aca6b8eae1e310404f60"}
+flickr = new Flickr(keys);
 
 /* GET home page. */
 
@@ -103,11 +106,11 @@ router.post('/verify', function(req, res){
 				lname: lastName,
 				email: email,
 				pass: password
-                	}).save(function(error, users) {
-                        	console.log('added an user', users,  error);
+            }).save(function(error, users) {
+                console.log('added an user', users,  error);
 				thisUser = users;
 				res.redirect('/home');
-                	});		
+            });		
 
 		}
 		else {
@@ -118,18 +121,15 @@ router.post('/verify', function(req, res){
 
 router.get('/home', function(req, res) {
 
+	Trip.find({user: thisUser.slug}, function(err, trips, count){
+			if (count == 0){
+				res.render('home', {"noTrips": "Sorry, you don't have any trips at this time!"})
+			}
+			else{
+				res.render('home', {"trips": trips});
+			}
+	});
 
-
-
-   	User.findOne({slug: thisUser.slug}, function(err, user, count) {
-   						if (user.trips == null) {
-   							res.render('home', {"noTrips": "Sorry, you don't have any trips at this time!"})
-   						}
-   						else{
-   							res.render('home', {"trips": user.trips});
-   						}
-                        
-                });
 });
 
 router.get('/logout', function(req, res){
@@ -139,12 +139,16 @@ router.get('/logout', function(req, res){
 
 router.get('/myTrips/:slug', function(req, res){
 		var tripToShow;
+		var tripWeather;
 
 		Trip.findOne({slug: req.params.slug}, function(err, trip, count) {
 			tripToShow = trip;
+			
 			getTripInfo();
                         
         });
+
+
 
         function getTripInfo(){
         	var departFlight, returnFlight, hotel, trip, tripToDoList;
@@ -154,15 +158,20 @@ router.get('/myTrips/:slug', function(req, res){
         	hotel = tripToShow.hotels[0];
         	trip = tripToShow;
 
+	
         	var tripItems = [];
         	var size;
 	        var counter = 0;
+
 	        function findItem(obj){
 	        	Item.findOne({slug: obj.slug }, function(err, item, count) {
 	        		tripItems.push(item);
 	        		counter += 1;
 	        		if (counter == size){
-	        			res.render('myTrip', {"departFlight" : departFlight, "returnFlight": returnFlight, "hotel" : hotel, "trip": trip, "toDoList": tripItems});
+	        			flickr.get("photos.search", {"text":trip.destination + ' vacation'}, function(err, result){
+   							 res.render('myTrip', {"departFlight" : departFlight, "returnFlight": returnFlight, "hotel" : hotel, "trip": trip, "toDoList": tripItems, "image": result.photos.photo[0]});
+						
+   						});
 
 	        		}
 	        		return obj;
@@ -294,15 +303,10 @@ router.post('/update/:slug', function(req, res){
 });
 
 router.post('/deleteTrip/:slug', function(req, res){
-	User.findOne({slug: thisUser.slug}, function(err, user, count) {
-		Trip.findOne({slug: req.params.slug}, function (error, trip){
- 				user.trips.id(trip.id).remove();
-                        user.save(function(saveErr, save, saveCount) {
-								res.redirect('/home');
-                                
-                        });
-                });
-		});
+
+	Trip.remove({slug: req.params.slug}, function(error){
+		res.redirect('/home');
+	});
 });
 
 router.post('/add/:slug', function(req, res){
@@ -323,7 +327,6 @@ router.post('/add/:slug', function(req, res){
                 });
 
 
-
 	//add to do to list 
 	function addToToDoList(){
 		Trip.findOne({slug: req.params.slug}, function(err, trip) {
@@ -335,18 +338,10 @@ router.post('/add/:slug', function(req, res){
 						if(toDoError == null){
 							trip.toDo = [toDoSave];
 							trip.save(function(error, save){
-								User.findOne({slug: thisUser.slug}, function(error, user){
-									user.trips = user.trips.map(function(userTrip){
-										if (userTrip.slug == save.slug){
-											return save;
-										}
-										return userTrip;
-									});
-									user.save(function(errUs, savedUS){
-										thisUser = savedUS;
-										res.redirect('/myTrips/' + req.params.slug);
-									});
-								});
+							
+								res.redirect('/myTrips/' + req.params.slug);
+								
+							
 							});
 						}
 					});
@@ -443,46 +438,44 @@ router.post('/addTrip', function(req, res){
 	function finalizeTrip(){
 		console.log()
 
-		var newToDoList = new ToDoList({
-						name: tripName
-		}).save(function(error, todo) {
-				console.log(error)
-				console.log('New toDoList added', todo);
-				if (tripName && destination){
-		                var newTrip = new Trip({
-		                        name: tripName,
-		                        destination: destination,
-		                        flights: [tripFlightOut, tripFlightIn],
-		                        hotels: [tripHotel], 
-		                        toDo: [todo]
-		                     	}).save(function(error, trip) {
-		                                console.log('added a trip', trip, error);
-		                                if (error == null){
-		                                	    thisTrip = trip;
-		                                	    addTripToUser();
-		                                       
-		                                }
-		                        });
-		        }else{
-		               res.render('addTrip', {"error": "Didn't complete trip information"});
-		        }					
-							
+		var newItem = new Item({
+			name: "Have an awesome trip!", 
+			completed: false
+		}).save(function(err, saveItem){
+			var newToDoList = new ToDoList({
+						name: tripName, 
+						items: [saveItem]
+				}).save(function(error, todo) {
+					console.log(error)
+					console.log('New toDoList added', todo);
+					if (tripName && destination){
+			                var newTrip = new Trip({
+			                        name: tripName,
+			                        user: thisUser.slug,
+			                        destination: destination,
+			                        flights: [tripFlightOut, tripFlightIn],
+			                        hotels: [tripHotel], 
+			                        toDo: [todo]
+			                     	}).save(function(error, trip) {
+			                                console.log('added a trip', trip, error);
+			                                if (error == null){
+			                                	    thisTrip = trip;
+			                                	  	res.redirect('/home');
+			                                       
+			                                }
+			                        });
+			        }else{
+			               res.render('addTrip', {"error": "Didn't complete trip information"});
+			        }					
+								
+			});
+
 		});
+		
 
         
 	}
-	function addTripToUser() {
-                User.findOne({slug: thisUser.slug}, function(err, user, count) {
-                        user.trips.push(thisTrip);
-                        user.save(function(saveErr, save, saveCount) {
-                        		if (saveErr == null){
-                        			res.redirect('/home');
-                        		}
-                                
-                        });
-                });
-        }
-
+	
 
 });
 

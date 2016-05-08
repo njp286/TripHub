@@ -1,62 +1,80 @@
-<div class='row'>
+<body>
+<img src="https://farm{{image.farm}}.staticflickr.com/{{image.server}}/{{image.id}}_{{image.secret}}.jpg" id="bg" alt="">
+
+<div id="wrapper">
+  <div id="header">
+  </div>
+  <div id="content">
+    <div class='row' >
 
 
-<form action="/deleteTrip/{{trip.slug}}" method="post">
-  <button name='{{trip.name}}' type="submit">Delete Trip</button>
-</form>
+      <form action="/deleteTrip/{{trip.slug}}" method="post">
+        <button  id='navigationButton' style="margin-left:55px; float: left; width: 130px;  margin-top:15px;" name='{{trip.name}}' type="submit">Delete Trip</button>
+      </form>
 
-<form action="/update/{{trip.slug}}" method="post">
-  <button type="submit">Home</button>
+      <form action="/update/{{trip.slug}}" method="post">
+        <button  id='navigationButton' style="float: right; width: 130px; margin-right: 55px; margin-top:15px" type="submit">Home</button>
+        <br><br>
+        <br>
+    </div>
+
+    <div class='row'>
+      <div class='col-md-1'></div>
+      <div class='col-md-10' style=' background-color: rgba(255,255,255,0.9);align-self:stretch;'>
+        <h1 id='title'>{{trip.name}} -- {{trip.destination}}</h1>
+        <h2 id='title'>{{departFlight.date}} to {{returnFlight.date}}</h2> 
+        <div class='row'>
+          <div class='col-md-3'>
+            <h2 id='title'> Departing Flight </h3>
+            <h4> {{departFlight.airline}} </h4>
+            <h4> {{departFlight.flightNum}} </h4>
+            <h4> {{departFlight.date}}</h4>
+            <h4> Terminal {{departFlight.terminal}} </h4>
+          </div>
+          <div class='col-md-3'>
+            <h2 id='title'> Return Flight </h3>
+            <h4> {{returnFlight.airline}} </h4>
+            <h4> {{returnFlight.flightNum}}</h4>
+            <h4> {{returnFlight.date}}</h4>
+            <h4> Terminal {{returnFlight.terminal}}</h4>
+          </div>
+          <div class='col-md-3'>
+
+            <h2 id='title'> To Do List </h3>
+
+            {{#each toDoList}}
+            {{#if this.completed}}
+            	<input id='{{{this.slug}}}' type='checkbox' name='checkedToDo' value='{{{this.slug}}}' checked='{{{this.completed}}}'><h6 style="display: inline"> {{{this.name}}}</h6><br>
+            {{else}}
+            	<input id='{{{this.slug}}}' type='checkbox' name='checkedToDo' value='{{{this.slug}}}'><h6 style="display: inline"> {{{this.name}}}</h6><br>
+            {{/if}}
 
 
+            {{/each}}
 
-<h2 id='titleSide'>TRIPHUB</h2> <h1 id='trip'>{{trip.name}}</h1>
-</div>
-<div class='row'>
-  <div class='col-md-3'></div>
-  <div class='col-md-6'>
+            </form>
+            <br>
+            <form action="/add/{{trip.slug}}" method="post">
+            	<input type="text" name="toDo"> <button id='navigationButton' type="submit">Add to list</button>
+            </form>
+            <br>
+          </div>
+          <div class='col-md-3'>
+            <h2 id='title'> Hotel Info </h3>
+            <h4> {{hotel.name}} </h4>
+            <h4> {{hotel.address}} </h4>
+            <h4> Check In: {{hotel.chInDate}} </h4>
+            <h4> Check Out: {{hotel.chOutDate}} </h4>
+          </div>
 
-    <h3> Departing Flight </h3>
-    <h4> {{departFlight.flightNum}} </h4>
-    <h4> {{departFlight.date}}</h4>
-    <h4> Terminal {{departFlight.terminal}} </h4>
-    <h3> Hotel Info </h3>
-    <h4> {{hotel.name}} </h4>
-    <h4> {{hotel.address}} </h4>
-    <h4> Check In: {{hotel.chInDate}} </h4>
-    <h4> Check Out: {{hotel.chOutDate}} </h4>
-    <h3> Return Flight </h3>
-    <h4> {{returnFlight.flightNum}}</h4>
-    <h4> {{returnFlight.date}}</h4>
-    <h4> Terminal {{returnFlight.terminal}}</h4>
-
-    <h3> TO DO LIST </h3>
-
-    {{#each toDoList}}
-    {{#if this.completed}}
-    	<input id='{{{this.slug}}}' type='checkbox' name='checkedToDo' value='{{{this.slug}}}' checked='{{{this.completed}}}'>{{{this.name}}}<br>
-    {{else}}
-    	<input id='{{{this.slug}}}' type='checkbox' name='checkedToDo' value='{{{this.slug}}}'>{{{this.name}}}<br>
-    {{/if}}
-
-
-    {{/each}}
-
-    </form>
-
-    <form action="/add/{{trip.slug}}" method="post">
-    	To do: <input type="text" name="toDo"> <button type="submit">Submit</button>
-    </form>
-
-    <div id="slideshow">
-       <div>
-         <img src="//farm6.static.flickr.com/5224/5658667829_2bb7d42a9c_m.jpg">
-       </div>
-       <div>
-         <img src="//farm6.static.flickr.com/5230/5638093881_a791e4f819_m.jpg">
-       </div>
+        </div>
+      </div>
+      <div class='col-md-1'></div>
     </div>
   </div>
-  <div class='col-md-3'></div>
+  <div id='footer'>
+      <p>Made by: <a href="http://www.nathanielpisierra.com">
+      Nathaniel PiSierra</a>.</p>
+  </div>
 </div>
-
+</body>

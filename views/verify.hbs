@@ -1,17 +1,25 @@
+<body>
+<img src="https://media.giphy.com/media/2FayUBN5Kl5sMdsIg/giphy.gif" id="bg" alt="">
 <div class='row'>
 	<div class='col-md-3'></div>
-	<div class='col-md-6'>
-		<h1 id='titleMain'>TRIPHUB</h1>
+	<div class='col-md-6' style=' background-color: rgba(255,255,255,0.8); align-self:stretch;'>
+		<h1 id='title'>TRIPHUB</h1>
 
 		<br><br>
-		{{error}}
+		<h5>{{error}}</h5>
 
 		<h3> Enter your verification code </h3>
 
 		<form action="/verify" method="post">
-			Verification Code <input type="text" name="code"> 
-			<button type="submit">Submit</button>
+			<p>Verification Code</p> <input type="text" name="code"> 
+			<button id='pinkButton' type="submit">Submit</button>
 		</form>
 	</div>
 	<div class='col-md-3'></div>
 </div>
+<footer>
+    <br>
+    <p>Made by: <a href="http://www.nathanielpisierra.com">
+    Nathaniel PiSierra</a>.</p>
+</footer>
+</body>

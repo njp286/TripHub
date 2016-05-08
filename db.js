@@ -40,8 +40,18 @@ Hotel.plugin(URLSlugs('name'));
 
 
 
+var User = new mongoose.Schema({
+        fname: String,
+        lname: String,
+        email: String,
+        pass: String
+});
+
+User.plugin(URLSlugs('email'));
+
 var Trip = new mongoose.Schema({
         name: String,
+        user: String, 
         destination: String,
         flights: [Flight],
         hotels: [Hotel],
@@ -52,15 +62,7 @@ Trip.plugin(URLSlugs('name'));
 
 
 
-var User = new mongoose.Schema({
-        fname: String,
-        lname: String,
-        email: String,
-        pass: String,
-        trips: [Trip]
-});
 
-User.plugin(URLSlugs('email'));
 
 
 
