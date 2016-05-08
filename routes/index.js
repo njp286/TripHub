@@ -1,8 +1,8 @@
 var express = require('express');
 var session = require('express-session')
 var router = express.Router();
-var authy = require('authy')('41f3fe0a27e1c9cba05c30933811a2b8', 'http://sandbox-api.authy.com');
-//var authy = require('authy')('YiHSBD4U3V6IThs3KiFRKKZwltpw36KY');
+//var authy = require('authy')('41f3fe0a27e1c9cba05c30933811a2b8', 'http://sandbox-api.authy.com');
+var authy = require('authy')('YiHSBD4U3V6IThs3KiFRKKZwltpw36KY');
 var Flickr = require('node-flickr');
 var mongoose = require('mongoose');
 var User = mongoose.model('User');
@@ -11,15 +11,10 @@ var Flight = mongoose.model('Flight');
 var Hotel = mongoose.model('Hotel');
 var ToDoList = mongoose.model('ToDoList');
 var Item = mongoose.model('Item');
+var fs = require('fs');
 
-var thisUser;
 
-var phoneNum;
-var phoneWO;
-var firstName;
-var lastName;
-var email;
-var password;
+
 
 var keys = {"api_key": "7a55b9d8e3e3aca6b8eae1e310404f60"}
 flickr = new Flickr(keys);
@@ -41,8 +36,8 @@ router.post('/login', function(req, res) {
 
 	User.findOne({email: email, pass: pass}, function(err, user, count) {
 		console.log(err, user, count);
-		thisUser = user;
-		if (thisUser == null) {
+		req.session.thisUser = user;
+		if (req.session.thisUser == null) {
          	       res.render('login', {"error": "Error found"});
         	}
         	else{  
@@ -62,7 +57,7 @@ router.post('/register', function(req, res) {
 	var emailADR = req.body.email;
 	var phone = req.body.phoneNum;
 	var output = [phone.slice(0, 3), '-', phone.slice(3)].join('');
-	var phone2 = [output.slice(0, 3), '-', output.slice(3)].join('');
+	var phone2 = [output.slice(0, 7), '-', output.slice(7)].join('');
 	var pass = req.body.password;
 	
 
@@ -70,12 +65,12 @@ router.post('/register', function(req, res) {
 		console.log(err);
 		console.log(resp);
 		if(err == null){
-			firstName = first;
-			lastName = last;
-			email = emailADR;
-			password = pass;
-			phoneWO = phone;
-			phoneNum = phone2;
+			req.session.firstName = first;
+			req.session.lastName = last;
+			req.session.email = emailADR;
+			req.session.password = pass;
+			req.session.phoneWO = phone;
+			req.session.phoneNum = phone2;
 			res.redirect('/verify');
 		}
 		else{
@@ -83,6 +78,23 @@ router.post('/register', function(req, res) {
 		}
 	});
 
+
+});
+
+router.get('/reregister', function(req, res){
+
+
+
+	authy.phones().verification_start(phoneNum, '1', 'sms', function(err, resp) {
+			if(err == null){
+				console.log(resp);
+				var message = 'Text message sent to ' + phoneNum + '.';
+				res.render('verify', {"error": message});
+			}
+			else{
+				res.render('verify', {"error": err});
+			}
+		});
 
 });
 
@@ -98,17 +110,17 @@ router.post('/verify', function(req, res){
                 console.log(err);
                 console.log(resp);
 
-		if(err != null){
+		if(err == null){
 			//add user
         	      
 			var usernew = new User({
-				fname: firstName,
-				lname: lastName,
-				email: email,
-				pass: password
+				fname: req.session.firstName,
+				lname: req.session.lastName,
+				email: req.session.email,
+				pass: req.session.password
             }).save(function(error, users) {
                 console.log('added an user', users,  error);
-				thisUser = users;
+				req.session.thisUser = users;
 				res.redirect('/home');
             });		
 
@@ -121,12 +133,12 @@ router.post('/verify', function(req, res){
 
 router.get('/home', function(req, res) {
 
-	Trip.find({user: thisUser.slug}, function(err, trips, count){
+	Trip.find({user: req.session.thisUser.slug}, function(err, trips, count){
 			if (count == 0){
-				res.render('home', {"noTrips": "Sorry, you don't have any trips at this time!"})
+				res.render('/login');
 			}
 			else{
-				res.render('home', {"trips": trips});
+				res.render('home', {"trips": trips, "user": req.session.thisUser});
 			}
 	});
 
@@ -134,10 +146,16 @@ router.get('/home', function(req, res) {
 
 router.get('/logout', function(req, res){
 	///DEAL W/ Logout Stuff
+	req.session = null;
 	res.redirect('/login');
 });
 
 router.get('/myTrips/:slug', function(req, res){
+
+		if (req.session.thisUser == null){
+			res.redirect('/login');
+			return;
+		}
 		var tripToShow;
 		var tripWeather;
 
@@ -169,8 +187,15 @@ router.get('/myTrips/:slug', function(req, res){
 	        		counter += 1;
 	        		if (counter == size){
 	        			flickr.get("photos.search", {"text":trip.destination + ' vacation'}, function(err, result){
-   							 res.render('myTrip', {"departFlight" : departFlight, "returnFlight": returnFlight, "hotel" : hotel, "trip": trip, "toDoList": tripItems, "image": result.photos.photo[0]});
-						
+	        				var photos = JSON.stringify(result);
+	        				fs.writeFile('public/json/photos.json', JSON.stringify({"photo": result.photos.photo}), function (err) {
+	        						var log = fs.readFile('public/json/photos.json', function(error, obj){
+	        							var string = JSON.parse(obj);
+		        						console.log(err);
+	  									res.render('myTrip', {"departFlight" : departFlight, "returnFlight": returnFlight, "hotel" : hotel, "trip": trip, "toDoList": tripItems, "image": result.photos.photo[0]});
+	        						});
+
+							});
    						});
 
 	        		}
@@ -210,6 +235,11 @@ router.get('/myTrips/:slug', function(req, res){
 //function for saving checkboxes when going home
 router.post('/update/:slug', function(req, res){
 	//Update checkboxes when going home
+	if (req.session.thisUser == null){
+		res.redirect('/login');
+		return;
+	}
+
 	var updatedItems;
 	var myArray = req.body.checkedToDo;
 	var changesMade = 0;
@@ -304,6 +334,11 @@ router.post('/update/:slug', function(req, res){
 
 router.post('/deleteTrip/:slug', function(req, res){
 
+	if (req.session.thisUser == null){
+		res.redirect('/login');
+		return;
+	}
+
 	Trip.remove({slug: req.params.slug}, function(error){
 		res.redirect('/home');
 	});
@@ -311,6 +346,10 @@ router.post('/deleteTrip/:slug', function(req, res){
 
 router.post('/add/:slug', function(req, res){
 	
+	if (req.session.thisUser == null){
+		res.redirect('/login');
+		return;
+	}
 
 	var itemToAdd;
 	var tripToDoList;
@@ -354,11 +393,21 @@ router.post('/add/:slug', function(req, res){
 });
 
 router.get('/addTrip', function(req, res){
+	if (req.session.thisUser == null){
+		res.redirect('/login');
+		return;
+	}
+
 	res.render('addTrip');
 });
 
 router.post('/addTrip', function(req, res){
 	//ADD TRIP TO USER
+	if (req.session.thisUser == null){
+		res.redirect('/login');
+		return;
+	}
+
 	var tripName = req.body.name;
 	var destination = req.body.dest;
 	var departDate = req.body.ddate;
@@ -451,7 +500,7 @@ router.post('/addTrip', function(req, res){
 					if (tripName && destination){
 			                var newTrip = new Trip({
 			                        name: tripName,
-			                        user: thisUser.slug,
+			                        user: req.session.thisUser.slug,
 			                        destination: destination,
 			                        flights: [tripFlightOut, tripFlightIn],
 			                        hotels: [tripHotel], 

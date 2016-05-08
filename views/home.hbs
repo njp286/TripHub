@@ -17,7 +17,7 @@
 
 		<h1 id='title'>TRIPHUB</h1>
 
-		<h2 id='title'> Your Trips </h2>
+		<h2 id='title'> {{user.fname}}'s Trips </h2>
 		<h6>{{noTrips}}</h6>
 		{{#each trips}}
 			<h3 style='color:pink'><a href="/myTrips/{{this.slug}}">{{this.name}}</a></h3>

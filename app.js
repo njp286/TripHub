@@ -25,6 +25,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var sessionOptions = { 
+  secret: 'secret for signing session id', 
+  saveUninitialized: false, 
+  resave: false 
+};
+
+app.use(session(sessionOptions));
 
 
 app.use('/', routes);

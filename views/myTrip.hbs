@@ -1,5 +1,6 @@
 <body>
-<img src="https://farm{{image.farm}}.staticflickr.com/{{image.server}}/{{image.id}}_{{image.secret}}.jpg" id="bg" alt="">
+<script src="/javascripts/photos.js"></script>
+<img src="https://farm{{image.farm}}.staticflickr.com/{{image.server}}/{{image.id}}_{{image.secret}}.jpg" id="bg" alt="{{image.id}}">
 
 <div id="wrapper">
   <div id="header">
@@ -69,7 +70,11 @@
 
         </div>
       </div>
-      <div class='col-md-1'></div>
+      <div class='col-md-1' >
+
+          <button style="margin-top:200px" id='nextImageButton' type="submit"> Next Image </button>
+
+      </div>
     </div>
   </div>
   <div id='footer'>
@@ -77,4 +82,5 @@
       Nathaniel PiSierra</a>.</p>
   </div>
 </div>
+
 </body>
