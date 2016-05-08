@@ -88,7 +88,7 @@ router.get('/reregister', function(req, res){
 	authy.phones().verification_start(req.session.phoneNum, '1', 'sms', function(err, resp) {
 			if(err == null){
 				console.log(resp);
-				var message = 'Text message sent to ' + phoneNum + '.';
+				var message = 'Text message sent to ' + req.session.phoneNum + '.';
 				res.render('verify', {"error": message});
 			}
 			else{
