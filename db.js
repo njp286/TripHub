@@ -4,27 +4,27 @@ var mongoose = require('mongoose'),
 // my schema goes here!
 
 
-var User = new mongoose.Schema({
-        fname: String,
-        lname: String,
-        email: String,
-        pass: String
-});
 
-User.plugin(URLSlugs('email'));
 
 var Item = new mongoose.Schema({
         name: String,
-        completed: Boolean,
-	user: User
+        completed: Boolean
 });
+
+Item.plugin(URLSlugs('name'));
+
+var ToDoList = new mongoose.Schema({
+        name: String,
+        items: [Item]
+});
+
+ToDoList.plugin(URLSlugs('name'));
 
 var Flight = new mongoose.Schema({
         airline: String,
         date: String,
         flightNum: String,
         terminal: String,
-	user: User
 });
 
 Flight.plugin(URLSlugs('flightNum'));
@@ -34,7 +34,6 @@ var Hotel = new mongoose.Schema({
         address: String,
         chInDate: String,
         chOutDate: String,
-	user: User
 });
 
 Hotel.plugin(URLSlugs('name'));
@@ -46,16 +45,22 @@ var Trip = new mongoose.Schema({
         destination: String,
         flights: [Flight],
         hotels: [Hotel],
-	user: User
+        toDo: [ToDoList]
 });
 
 Trip.plugin(URLSlugs('name'));
 
-var ToDoList = new mongoose.Schema({
-        items: [Item],
-        trip: Trip
+
+
+var User = new mongoose.Schema({
+        fname: String,
+        lname: String,
+        email: String,
+        pass: String,
+        trips: [Trip]
 });
 
+User.plugin(URLSlugs('email'));
 
 
 
