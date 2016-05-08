@@ -85,7 +85,7 @@ router.get('/reregister', function(req, res){
 
 
 
-	authy.phones().verification_start(phoneNum, '1', 'sms', function(err, resp) {
+	authy.phones().verification_start(req.session.phoneNum, '1', 'sms', function(err, resp) {
 			if(err == null){
 				console.log(resp);
 				var message = 'Text message sent to ' + phoneNum + '.';
@@ -106,7 +106,7 @@ router.get('/verify', function(req, res) {
 router.post('/verify', function(req, res){
 	var verCode = req.body.code;
 
-        authy.phones().verification_check(phoneNum, '1', verCode, function (err, resp) {
+        authy.phones().verification_check(req.session.phoneNum, '1', verCode, function (err, resp) {
                 console.log(err);
                 console.log(resp);
 
@@ -133,13 +133,13 @@ router.post('/verify', function(req, res){
 
 router.get('/home', function(req, res) {
 
+	if (req.session.thisUser == null){
+		res.render('login');
+		return;
+	}
+
 	Trip.find({user: req.session.thisUser.slug}, function(err, trips, count){
-			if (count == 0){
-				res.render('/login');
-			}
-			else{
-				res.render('home', {"trips": trips, "user": req.session.thisUser});
-			}
+			res.render('home', {"trips": trips, "user": req.session.thisUser});
 	});
 
 });
